@@ -39,7 +39,7 @@
         {% for item in items %}
         <tr>
           <td>{{ item.title }}</td>
-          <td>{{ item.status }}</td>
+          <td>{{ item.status.name }}</td>
           <td>
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target='#itemModal-{{ item.id }}'>
               Edit
@@ -57,8 +57,8 @@
                 </button>
               </div>
               <div class="modal-body">
-                <form action="/save" method="POST">
-                  <input type="number" hidden id="itemId" name="itemId" required value="{{ item.id }}">
+                <form id="save-item-{{ item.id }}" action="/save" method="POST" >
+                  <input type="text" hidden id="itemId" name="itemId" required value="{{ item.id }}">
                   <br />
                   <div class="form-group">
                     <label for="itemTitle">Item Title</label>
@@ -67,16 +67,15 @@
                   <div class="form-group">
                     <label for="itemStatus">Item Status</label>
                     <select name="itemStatus" id="itemStatus" class="form-control">
-                      <option value="Not Started" {% if  item.status == 'Not Started' %} selected {% endif %}>
-                        Not Started
+                      {% for status in statuses %}
+                      <option value="{{ status.id }}" {% if  item.status.name == "{{ status.name }}" %} selected {% endif %}>
+                        {{ status.name }}
                       </option>
-                      <option value="Completed" {% if  item.status == 'Completed' %} selected {% endif %}>
-                        Completed
-                      </option>
+                      {% endfor %}
                     </select>
                   </div>
                   <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <button type="submit" class="btn btn-primary" form="save-item-{{ item.id }}" >Save changes</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                   </div>
                 </form>

@@ -1,5 +1,4 @@
 from flask import session
-import trello as t
 
 _DEFAULT_ITEMS = [
     { 'id': 1, 'status': 'Not Started', 'title': 'List saved todo items' },
@@ -14,9 +13,7 @@ def get_items():
     Returns:
         list: The list of saved items.
     """
-    #return session.get('items', _DEFAULT_ITEMS)
-    return t.get_items()
-
+    return session.get('items', _DEFAULT_ITEMS)
 
 def get_item(id):
     """

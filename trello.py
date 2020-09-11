@@ -7,6 +7,17 @@ app_board_name='To Do App'
 trello_member='brendanmcdaniel'
 trello_endpoint='https://api.trello.com/1/'
 
+class item:
+    def __init__(self, id, status, title):
+        self.id = id
+        self.status = status
+        self.title = title
+
+class status:
+    def __init__(self, id, name):
+        self.id = id
+        self.name = name
+
 # Check if proxy env vars have been set
 try:
     http_proxy = os.environ['http_proxy']
@@ -35,6 +46,22 @@ proxyDict = {
 
 headers={}
 
+def get_item(id):
+    tempItem = requests.get(trello_endpoint+'cards/'+id+'?key='+trello_key+'&token='+trello_token, headers=headers, proxies=proxyDict).json()
+    tempItemListName = requests.get(trello_endpoint+'cards/'+id+'/list?key='+trello_key+'&token='+trello_token, headers=headers, proxies=proxyDict).json()
+    itemList = status(tempItem['idList'], tempItemListName['name'])
+    returnedItem = item(tempItem['id'],itemList, tempItem['name'])
+    return returnedItem
+
+def add_item(listId, title):
+    requests.post(trello_endpoint+'cards?name='+title+'&idList='+listId+'&key='+trello_key+'&token='+trello_token, headers=headers, proxies=proxyDict).json()
+
+def delete_item(id):
+    requests.delete(trello_endpoint+'cards/'+id+'?key='+trello_key+'&token='+trello_token, headers=headers, proxies=proxyDict).json()
+
+def save_item(id, idList, title):
+    requests.put(trello_endpoint+'cards/'+id+'?name='+title+'&key='+trello_key+'&idList='+idList+'&token='+trello_token, headers=headers, proxies=proxyDict).json()
+
 def get_app_board(app_board_name):
     boards = requests.get(trello_endpoint+'members/'+trello_member+'/boards?key='+trello_key+'&token='+trello_token, headers=headers, proxies=proxyDict).json()
     for x in range(len(boards)):
@@ -45,25 +72,18 @@ def get_app_board(app_board_name):
 def get_app_board_lists():
     app_board_id=get_app_board(app_board_name)[1]
     app_board_lists = requests.get(trello_endpoint+'boards/'+app_board_id+'/lists?key='+trello_key+'&token='+trello_token, headers=headers, proxies=proxyDict).json()
-    board_lists={}
-    for x in range(len(app_board_lists)):
-        board_lists[app_board_lists[x]['name']] = {
-                'id':app_board_lists[x]['id']
-            }
+    board_lists=[]
+    for x in range(len(app_board_lists)):   
+        board_lists = board_lists + [status(app_board_lists[x]['id'], app_board_lists[x]['name'])]
     return board_lists
 
 def get_board_list_cards(app_board_lists):
     cards=[]
-    for app_board_lists, value in app_board_lists.items():
-        print('Working on '+app_board_lists)
-        list_cards = requests.get(trello_endpoint+'lists/'+value['id']+'/cards?key='+trello_key+'&token='+trello_token, headers=headers, proxies=proxyDict).json()
-        
+    for status in app_board_lists:
+        print(status.name)
+        list_cards = requests.get(trello_endpoint+'lists/'+status.id+'/cards?key='+trello_key+'&token='+trello_token, headers=headers, proxies=proxyDict).json()      
         for x in range(len(list_cards)):
-            cards = cards + [{
-                'id':list_cards[x]['id'],
-                'status':app_board_lists,
-                'title':list_cards[x]['name']   
-            }]
+            cards = cards + [item(list_cards[x]['id'],status,list_cards[x]['name'])]
     return cards
 
 def get_items():
