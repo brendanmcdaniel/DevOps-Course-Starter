@@ -2,23 +2,32 @@
 
 ## Getting started
 
+### Installing Poetry
+Installation instructions can be found [`https://python-poetry.org/docs/%23installation`](here).
+
+### Environment variables
+
+you will need to take a copy of .env-template and call .env to which you will then need to provide values for 
+TRELLO_KEY
+TRELLO_TOKEN
+
 The project uses a virtual environment to isolate package dependencies. To create the virtual environment and install required packages, run the following from a bash shell terminal:
 
 ### On macOS and Linux
 ```bash
-$ source setup.sh
+$ poetry install
 ```
 ### On Windows (Using Git Bash)
 ```bash
-$ source setup.sh --windows
+$ poetry install
 ```
 
 Once the setup script has completed and all packages have been installed, start the Flask app by running:
 ```bash
-$ flask run
+$ poetry run flask run
 ```
 
-You should see output similar to the following:
+Your app should now be running in daemon mode:
 ```bash
  * Serving Flask app "app" (lazy loading)
  * Environment: development
@@ -29,3 +38,16 @@ You should see output similar to the following:
  * Debugger PIN: 226-556-590
 ```
 Now visit [`http://localhost:5000/`](http://localhost:5000/) in your web browser to view the app.
+
+### Run using vagrant
+
+If you havent already you will want to install vagrant details found [`https://www.vagrantup.com/docs/installation`](here)
+
+Using a terminal you should change directory to this project and run the following
+
+```vagrant up```
+
+vagrant will begin to build your app using gunicorn rather than flask, once the build scripts stop providing feedback you
+can now visit [`http://localhost:5000/`](http://localhost:5000/) in your web browser to view the app.
+
+
