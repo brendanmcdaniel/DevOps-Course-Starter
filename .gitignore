@@ -111,6 +111,13 @@ dmypy.json
 
 ### Virtual environment ###
 env/
+.venv/
 
 ### Configuration files ###
 .env
+
+### Vagrant
+.vagrant/
+
+### VSCode
+.vscode/*
