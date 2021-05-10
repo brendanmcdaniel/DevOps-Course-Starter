@@ -52,10 +52,17 @@ can now visit [`http://localhost:5000/`](http://localhost:5000/) in your web bro
 
 ### Run using docker
 
-### Development build
+### Development 
+### build
 ```docker build --target development --tag todo-app:dev . ```
+### run
+```docker run --env-file ./.env -p 5000:5000 --mount type=bind,source="$(pwd)"/,target=/todo_app todo-app:dev```
 
-### Production build
+### Production 
+### build
 ```docker build --target production --tag todo-app:prod . ```
+### run
+```docker run --env-file ./.env -p 5000:5000 --mount type=bind,source="$(pwd)"/,target=/todo_app todo-app:prod```
 
-```docker run --env-file ./.env -p 5000:80 --mount type=bind,source="$(pwd)"/,target=/todo_app todo-app:dev```
+### Run using docker compose (with image build) 
+```docker compose up --build```
