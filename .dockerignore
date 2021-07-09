@@ -1,0 +1,13 @@
+__pycache__/
+.git
+.sonarlint/
+.vagrant/
+.venv/
+todo-app/.venv/
+.vscode/
+.env
+.env.template
+.gitignore
+app.pyc
+README.md
+wsgi.pyc

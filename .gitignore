@@ -112,6 +112,7 @@ dmypy.json
 ### Virtual environment ###
 env/
 .venv/
+todo-app/.venv
 
 ### Configuration files ###
 .env

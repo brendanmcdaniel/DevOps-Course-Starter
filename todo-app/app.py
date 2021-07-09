@@ -5,7 +5,6 @@ import trello as t
 pp = pprint.PrettyPrinter(indent=4)
 
 app = Flask(__name__)
-app.config.from_object('flask_config.Config')
 
 @app.route('/')
 def index(): 
