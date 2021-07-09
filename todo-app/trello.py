@@ -3,9 +3,10 @@ import pprint
 import requests
 
 pp = pprint.PrettyPrinter(indent=4)
-app_board_name='To Do App'
-trello_member='brendanmcdaniel'
-trello_endpoint='https://api.trello.com/1/'
+app_board_name = os.environ['APP_BOARD_NAME']
+pp.pprint(app_board_name)
+trello_member = os.environ['TRELLO_USER']
+trello_endpoint = os.environ['TRELLO_ENDPOINT']
 
 class item:
     def __init__(self, id, status, title):
@@ -22,7 +23,7 @@ class status:
 try:
     http_proxy = os.environ['http_proxy']
 except KeyError:
-    pp.pprint('No HTTP proxy found')
+    # pp.pprint('No HTTP proxy found')
     http_proxy = ''
 try:
     trello_key = os.environ['TRELLO_KEY']
@@ -32,11 +33,10 @@ except KeyError:
     trello_key = ''
     trello_token = ''
 
-# Environment variables set for trell api
 try:
     https_proxy = os.environ['https_proxy']
 except KeyError:
-    pp.pprint('No HTTPS proxy found')
+    # pp.pprint('No HTTPS proxy found')
     https_proxy = ''
 
 proxyDict = { 

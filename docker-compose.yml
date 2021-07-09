@@ -6,6 +6,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: dev
+      target: development
     ports:
         - "5000:5000"
+    volumes:
+      - type: bind
+        source: ${PWD}/todo-app
+        target: /todo-app

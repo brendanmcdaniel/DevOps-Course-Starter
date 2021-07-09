@@ -3,6 +3,7 @@ __pycache__/
 .sonarlint/
 .vagrant/
 .venv/
+todo-app/.venv/
 .vscode/
 .env
 .env.template
