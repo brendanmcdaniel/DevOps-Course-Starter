@@ -3,87 +3,76 @@ import pprint
 import requests
 
 pp = pprint.PrettyPrinter(indent=4)
-app_board_name = os.environ['APP_BOARD_NAME']
-pp.pprint(app_board_name)
-trello_member = os.environ['TRELLO_USER']
-trello_endpoint = os.environ['TRELLO_ENDPOINT']
+try:
+    TRELLO_KEY = os.environ['TRELLO_KEY']
+    TRELLO_TOKEN = os.environ['TRELLO_TOKEN']
+except KeyError:
+    pp.pprint('Trello env vars dont seem to be set')
+    TRELLO_KEY = ''
+    TRELLO_TOKEN = ''
 
-class item:
+APP_BOARD_NAME = os.environ['APP_BOARD_NAME']
+TRELLO_MEMBER = os.environ['TRELLO_USER']
+TRELLO_ENDPOINT = os.environ['TRELLO_ENDPOINT']
+PARAMS = {'key': TRELLO_KEY, 'token': TRELLO_TOKEN}
+
+class Item:       
     def __init__(self, id, status, title):
         self.id = id
         self.status = status
         self.title = title
+    def __str__(self):
+        return "id: %s, status: %s title: %s" % (self.id, self.status.name, self.title)
 
-class status:
+class Status:
     def __init__(self, id, name):
         self.id = id
         self.name = name
-
-# Check if proxy env vars have been set
-try:
-    http_proxy = os.environ['http_proxy']
-except KeyError:
-    # pp.pprint('No HTTP proxy found')
-    http_proxy = ''
-try:
-    trello_key = os.environ['TRELLO_KEY']
-    trello_token = os.environ['TRELLO_TOKEN']
-except KeyError:
-    pp.pprint('Trello env vars dont seem to be set')
-    trello_key = ''
-    trello_token = ''
-
-try:
-    https_proxy = os.environ['https_proxy']
-except KeyError:
-    # pp.pprint('No HTTPS proxy found')
-    https_proxy = ''
-
-proxyDict = { 
-            "http"  : http_proxy, 
-            "https" : https_proxy
-            }
-
-headers={}
+    def __str__(self):
+        return "id: %s, name: %s" % (self.id, self.name)
 
 def get_item(id):
-    tempItem = requests.get(trello_endpoint+'cards/'+id+'?key='+trello_key+'&token='+trello_token, headers=headers, proxies=proxyDict).json()
-    tempItemListName = requests.get(trello_endpoint+'cards/'+id+'/list?key='+trello_key+'&token='+trello_token, headers=headers, proxies=proxyDict).json()
-    itemList = status(tempItem['idList'], tempItemListName['name'])
-    returnedItem = item(tempItem['id'],itemList, tempItem['name'])
-    return returnedItem
+    temp_item = requests.get(TRELLO_ENDPOINT+'cards/'+id, params=PARAMS).json()
+    temp_item_list_name = requests.get(TRELLO_ENDPOINT+'cards/'+id+'/list', params=PARAMS).json()
+    item_list = Status(temp_item['idList'], temp_item_list_name['name'])
+    returned_item = Item(temp_item['id'],item_list, temp_item['name'])
+    return returned_item
 
 def add_item(listId, title):
-    requests.post(trello_endpoint+'cards?name='+title+'&idList='+listId+'&key='+trello_key+'&token='+trello_token, headers=headers, proxies=proxyDict).json()
+    requests.post(TRELLO_ENDPOINT+'cards?name='+title+'&idList='+listId, params=PARAMS).json()
 
 def delete_item(id):
-    requests.delete(trello_endpoint+'cards/'+id+'?key='+trello_key+'&token='+trello_token, headers=headers, proxies=proxyDict).json()
+    requests.delete(TRELLO_ENDPOINT+'cards/'+id, params=PARAMS).json()
 
 def save_item(id, idList, title):
-    requests.put(trello_endpoint+'cards/'+id+'?name='+title+'&key='+trello_key+'&idList='+idList+'&token='+trello_token, headers=headers, proxies=proxyDict).json()
+    requests.put(TRELLO_ENDPOINT+'cards/'+id+'?name='+title+'&idList='+idList, params=PARAMS).json()
 
-def get_app_board(app_board_name):
-    boards = requests.get(trello_endpoint+'members/'+trello_member+'/boards?key='+trello_key+'&token='+trello_token, headers=headers, proxies=proxyDict).json()
+def get_app_board(APP_BOARD_NAME):
+    boards = requests.get(TRELLO_ENDPOINT+'members/'+TRELLO_MEMBER+'/boards', params=PARAMS).json()
     for x in range(len(boards)):
-        if boards[x]['name'] == app_board_name:
+        if boards[x]['name'] == APP_BOARD_NAME:
             board = (boards[x]['name'], boards[x]['id'])
     return board
 
 def get_app_board_lists():
-    app_board_id=get_app_board(app_board_name)[1]
-    app_board_lists = requests.get(trello_endpoint+'boards/'+app_board_id+'/lists?key='+trello_key+'&token='+trello_token, headers=headers, proxies=proxyDict).json()
+    app_board_id=get_app_board(APP_BOARD_NAME)[1]
+    app_board_lists = requests.get(
+        TRELLO_ENDPOINT
+        +'boards/'
+        +app_board_id
+        +'/lists',
+        params=PARAMS).json()
     board_lists=[]
-    for x in range(len(app_board_lists)):   
-        board_lists = board_lists + [status(app_board_lists[x]['id'], app_board_lists[x]['name'])]
+    for x in range(len(app_board_lists)):  
+        board_lists = board_lists + [Status(app_board_lists[x]['id'], app_board_lists[x]['name'])]
     return board_lists
 
 def get_board_list_cards(app_board_lists):
     cards=[]
     for status in app_board_lists:
-        print(status.name)
-        list_cards = requests.get(trello_endpoint+'lists/'+status.id+'/cards?key='+trello_key+'&token='+trello_token, headers=headers, proxies=proxyDict).json()      
+        list_cards = requests.get(TRELLO_ENDPOINT+'lists/'+status.id+'/cards', params=PARAMS).json()      
         for x in range(len(list_cards)):
-            cards = cards + [item(list_cards[x]['id'],status,list_cards[x]['name'])]
+            cards = cards + [Item(list_cards[x]['id'],status,list_cards[x]['name'])]
     return cards
 
 def get_items():

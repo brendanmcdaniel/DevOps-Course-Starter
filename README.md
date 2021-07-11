@@ -81,3 +81,10 @@ docker run --env-file ./.env -p 5000:5000 --mount type=bind,source="$(pwd)"/todo
 ```bash
 docker compose up --build
 ```
+
+### Testing
+pytest is used with this project, please ensure you have installed prior to running this command 
+from within the todo-app directory run 
+```bash 
+pytest
+```
